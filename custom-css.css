@@ -1,0 +1,102 @@
+.radio-buttons {
+  display: flex;
+}
+
+.radio-select-group {
+  width: 50vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.radio-button {
+  width: 29px;
+  height: 25px;
+  margin: 1px;
+  display: flex;
+  justify-content: center;
+  border: 2px solid #fff;
+  align-items: center;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.radio-button input{
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-button input:checked {
+  border: 1px solid #ce6324;
+}
+
+.radio-button input[type=radio]:checked ~ .dropdow-select {
+  display: block;
+}
+
+.dropdow-select {
+  width: 50px;
+  background-color: #fff;
+  position: absolute;
+  transform: translate(8px,94px);
+  display: none;
+  font-size: 15px;
+}
+
+.dropdow-select p {
+  color: #ce6324;
+  padding: 5px;
+  margin: 0;
+}
+
+.dropdow-select p:hover {
+  background-color: #eee;
+}
+
+body {
+  background-color: #333;
+  color: #fff;
+}
+
+.multiselect__tags {
+  background-color: #333;
+  color: #eee;
+}
+
+.multiselect__input::-webkit-input-placeholder {
+  color:#fff;
+}
+
+.multiselect__input::-moz-placeholder {
+  color:#fff;
+}
+
+.multiselect__input::-ms-placeholder {
+  color:#fff;
+}
+
+.multiselect__input::placeholder {
+  color:#fff;
+}
+
+.multiselect__tags:focus {
+  color: #fff;
+}
+
+.multiselect__tags:active {
+  color: #fff;
+}
+
+.multiselect__input, .multiselect__single {
+  background-color: #333;
+}
+
+.multiselect__input {
+  color: #fff;
+}
+
+.multiselect__single {
+  font-size: 13px;
+}

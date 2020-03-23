@@ -11,9 +11,11 @@
 <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-firestore.js"></script>
 <!-- Vue.JSmultiselect-->
-<script type="application/javascript" src="https://unpkg.com/vue-multiselect@2.1.0"></script>
+<script type="application/javascript" src="https://unpkg.com/vue-multiselect@2.1.6"></script>
+<link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.6/dist/vue-multiselect.min.css">
 <link rel="stylesheet" href="./vue-multiselect.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vue-ctk-date-time-picker@1.4.1/dist/vue-ctk-date-time-picker.css">
+<link rel="stylesheet" href="./custom-css.css">
 
 	<!-- Chart.js -->
 	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.24.0/min/moment.min.js"></script>
@@ -332,7 +334,7 @@ var firebaseConfig = {
 						
 											<label class="radio-button">
                         <input type="radio" name="radio-price_chart" value="minute" checked>
-                        <span id="minute" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">1m</span>
+                        <span for="minute" id="minute" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">1m</span>
 											</label>
 						
                       <label class="radio-button">
@@ -415,7 +417,6 @@ var firebaseConfig = {
 						</br>
 
 					<!-- multiselect: -->
-
 						<div id="app">
 							<multiselect style = "width: 200px; height: 50px;"
 							
@@ -427,7 +428,7 @@ var firebaseConfig = {
 								:clear-on-select="false" 
 								:preserve-search="true" 
 								:custom-label="customLabel"
-								placeholder="4 option selected" 
+								placeholder="Pick some" 
 								label="name" 
 								track-by="name" 
 								:preselect-first="false"
@@ -436,7 +437,7 @@ var firebaseConfig = {
 								:taggable="false"
 								@close = "onSelect"
 
-							>
+              >
 							<div
 								class="selection-count"
 								slot="selection"
@@ -445,8 +446,8 @@ var firebaseConfig = {
 							<template v-if="!isOpen && values.length">
 									{{ values.length }} options selected
 								</template>
-							</div>	
-							</multiselect>
+              </div>	
+              </multiselect>
 							<!-- <pre>{{ value }}</pre> -->
 							<!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
 						</div>
