@@ -1,0 +1,1755 @@
+
+<html>
+	
+	
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script><!--	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10"></script>	 -->
+	<script src="https://cdn.jsdelivr.net/npm/vue-tables-2@1.4.70/dist/vue-tables-2.min.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" type="text/javascript"></script>
+
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-firestore.js"></script>
+<!-- Vue.JSmultiselect-->
+<script type="application/javascript" src="https://unpkg.com/vue-multiselect@2.1.0"></script>
+<link rel="stylesheet" href="./vue-multiselect.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vue-ctk-date-time-picker@1.4.1/dist/vue-ctk-date-time-picker.css">
+
+	<!-- Chart.js -->
+	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.24.0/min/moment.min.js"></script>
+	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.slim.js" integrity="sha256-TjKvu34orT4v6tdwMFrmvqieKl/Rdep7T8hVq57FmEk=" crossorigin="anonymous"></script>
+	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes@0.4.0"></script>
+	
+	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.6.0"></script>
+	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@1.8.0"></script>
+	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@0.5.7/chartjs-plugin-annotation.min.js"></script>
+     
+	<script type="application/javascript">
+///firebase initialization///
+var firebaseConfig = {
+			apiKey: "AIzaSyCrYGJnNmth6RvAlz6rwvUO4AG956U-P2g",
+			authDomain: "bbb-erizo.firebaseapp.com",
+			databaseURL: "https://bbb-erizo.firebaseio.com",
+			projectId: "bbb-erizo",
+			storageBucket: "bbb-erizo.appspot.com",
+			messagingSenderId: "641077902577",
+			appId: "1:641077902577:web:a95eff46abf62ff9"
+ 		 };
+		
+		firebase.initializeApp(firebaseConfig);	
+		///firebase end///			
+
+        ///為替情報
+       
+        let BFBTCJPY;
+        let BFBTCUSD;
+        let BMXBTUSD;
+        let BFFXBTCJPY;
+        let USDJPY; 
+    
+        ///colorstyle
+        let color_chart = "office.BlueII6";
+    
+    
+    
+        ///損益計算///
+        var timeData = [];
+        var currentTime = moment(Date.now()).toISOString();
+        let Bitmex_dealData = [];
+        let Bitfly_dealData = [];
+        //各種array/
+    
+        let strategylist = [];
+        let strategylistcomplete = [];
+        var strategylistpreviousobj = [];
+        var strategylistobj = [];
+        var originalinformaion =[];
+        var information = [];
+        var json = [];
+        var json_bitflyer = [];
+        let json_bitmex = [];
+        var array = [];
+        var array2 = [];
+    
+        var strategyProfit = [];
+        let firebaserawdata = [];
+        let firebaserawdata_bitmex = [];
+        let firebaserawdata_bitflyer = [];
+    
+        //var strategylistpreviousobj = [];
+        let volumebuffer =[];
+        let candledata = [];
+        let volumedata = [];
+        let candletime = [];
+        let candlec =[];
+        let lowesttime;
+        ///arrow information///
+        const buyarrow = new Image();
+        buyarrow.src = "http://aifx2.sakura.ne.jp/image/buyarrow4.gif";
+        buyarrow.height = 10;
+        buyarrow.width = 10;
+    
+        const sellarrow = new Image();
+        sellarrow.src = "http://aifx2.sakura.ne.jp/image/sellarrow4.gif";
+        sellarrow.height = 10;
+        sellarrow.width = 10;
+    
+        ///candlestick color////
+        const upcolor="#1C9FA0";
+        const downcolor="#E54646";
+        const unchangedcolor="#ECF8F8";
+        const bordercolor ="#ECF8F8";
+    
+        ///annotation
+        let ask_bitmex;
+        let bid_bitmex;
+        let ask;
+        let bid;
+        let volume_bitmex;
+    
+        ///annotation///
+        let annotationx; 
+        let annotationy;
+    
+        ///websocket
+        const channelName_FX_BTC_JPY = "lightning_ticker_" + "FX_BTC_JPY";
+        const channelName_FX_BTC_JPY_execution = "lightning_executions_" + "FX_BTC_JPY";
+        const channelName_bitflyer = "lightning_ticker_" + "FX_BTC_JPY";
+        // const priChannel_bitflyer = "lightning_executions_" + "FX_BTC_JPY";
+        const channelName_BTC_JPY = "lightning_ticker_" + "BTC_JPY";
+            //const priChannel_BTC_JPY = "lightning_executions_" + "BTC_JPY";
+        const channelName_BTC_USD = "lightning_ticker_" + "BTC_USD";
+        ///periods
+        let periods =  60;
+    
+        ///realtimechart
+        let setduration = periods*110000;
+        let setdelay = -periods*10000;
+        let time= periods*1000;
+        let pasttime = periods*10000000;
+        let refres = 100;
+    
+        ///api fetch
+        let timing = "minute"
+        let candletotal = 200;
+        let url_bitflyer ='https://min-api.cryptocompare.com/data/histo' + timing + '?fsym=BTC&e=bitflyerfx&tsym=JPY&limit='+ candletotal;
+        let url_bitmex ='https://min-api.cryptocompare.com/data/histo' + timing + '?fsym=XBTUSD&e=bitmex&tsym=USD&limit='+ candletotal;
+            
+        ///itabitmex
+        var askData = [];
+        var askDataSource = [];
+        var askDataLabel = [];
+        var askDataLabelSource = [];
+    
+        var bidData = [];
+        var bidDataSource = [];
+        var bidDataLabel = [];
+        var bidDataLabelSource = [];
+        var AMax = 0;
+        var AMin = 0;
+        var BMax = 0;
+        var BMin = 0;
+        var max_ita_bitmex = 0;
+        var min_ita_bitmex = 0;
+    
+        var middleEle;
+    
+        ////ここはどうするか
+        var middle_price = 0;
+        var horizontalChart;
+        var horizontalChart2;
+        var innerText;
+    
+    
+        function addData(chart, data, labels) {
+                chart.data.labels = labels
+                chart.data.datasets.forEach((dataset) => {
+                    dataset.data = data
+                });
+                chart.options.scales.xAxes[0].ticks.min = min_ita_bitmex; // > 0 ? -min: 0;
+                chart.options.scales.xAxes[0].ticks.max = -2000000; // < 50 ? -50 : -max;
+                chart.update();
+            }
+
+
+
+	console.log("firebasestart");
+	// firebaseget();
+
+	function firebaseget() {
+
+	db=firebase.firestore();
+	console.log(db);
+	var firstsite = "users";
+	var secondsite = "test_user";
+	var thirdsite = "history";
+	//var forthsite = "2019-05-25T04:51:03.521Z";
+
+	var user =db.collection(firstsite);
+	//+"/"+secondsite+"/"+thirdsite +"/" +forthsite);
+	console.log(user);
+
+	var history = user.doc(secondsite).collection(thirdsite);
+	console.log(history);
+
+	return getMarker();
+
+
+	async function getMarker() {
+		
+	let snapshot = await history.get();
+
+		snapshot.docs.map(doc => {
+			console.log(doc.data());
+
+				firebaserawdata.push({
+
+					t:moment(doc.data().order_date.seconds*1000).toISOString(),
+					t2:doc.data().order_date.seconds*1000,
+					strategy:doc.data().strategy_name,
+					buysell:doc.data().side,
+					price:doc.data().price,
+					lot:doc.data().volume,
+					//profit:doc.data().profit,
+					orderdate:doc.data().order_date,
+					//exchange:doc.data().exchange,
+					exchange:doc.data().exchange,
+					type:doc.data().type,
+					trigger: doc.data().trigger,
+					volume:doc.data().volume,
+
+				})
+
+
+
+
+				if(doc.data().exchange == "bitflyer"){
+					firebaserawdata_bitflyer.push({
+
+						t:moment(doc.data().order_date.seconds*1000).toISOString(),
+						t2:doc.data().order_date.seconds*1000,
+						strategy:doc.data().strategy_name,
+						buysell:doc.data().side,
+						price:doc.data().price,
+						lot:doc.data().volume,
+						//profit:doc.data().profit,
+						fee:doc.data().fee,
+						orderdate:doc.data().order_date,
+						//exchange:doc.data().exchange,
+						exchange:doc.data().exchange,
+						type:doc.data().type,
+						trigger: doc.data().trigger,
+						volume:doc.data().volume,
+
+					})
+				} 
+				if(doc.data().exchange == "bitmex_testnet"||doc.data().exchange == "bitmex"){
+					firebaserawdata_bitmex.push({
+
+						t:moment(doc.data().order_date.seconds*1000).toISOString(),
+						t2:doc.data().order_date.seconds,
+						strategy:doc.data().strategy_name,
+						buysell:doc.data().side,
+						price:doc.data().price,
+						lot:doc.data().volume,
+						fee:doc.data().fee,
+						//profit:doc.data().profit,
+						orderdate:doc.data().order_date,
+						//exchange:doc.data().exchange,
+						exchange:doc.data().exchange,
+						type:doc.data().type,
+						trigger: doc.data().trigger,
+						volume:doc.data().volume,
+
+					})
+				}
+			});	
+
+		// cryptowatchfirst(timing);
+
+	};		
+	}
+
+
+  </script>             
+
+
+
+
+
+
+</head>  
+    <body>
+        <div class="col s９ m9 l9" id="vueSample" >
+			<!-- style = "margin-right: -10px ; margin-left: -10px " -->
+		<div class="card" v-bind:style="{height:boardHeight+'px'}">
+
+			<!-- <div class='card-move-up waves-effect waves-block waves-light'></div> -->
+				<div class="bbb-move-up cyan darken-3">
+					<span class="bbb-chart-title white-text"></span>
+					<div class='bbb-chart-revenue white-text' '>
+						<i class='material-icons float-right activator'></i>
+					</div>
+				</div>
+			<!-- </div> -->
+
+			<div class="card-content cyan darken-4 white-text"  v-bind:style="{height:contentHeight+'px'}" >
+				<div class="cyan darken-4 " style = "width: 30%;">
+					<div id="wrapper" >
+						<!-- button -->
+						
+
+						<div class="radio-select">
+                <div class="radio-select-group">
+
+										<div class="radio-buttons">
+                      
+											<label class="radio-button">
+												<input type="radio" name="radio-price" value="day" checked>
+                        <span class="checkmark" id="day" onclick="timeclick_soneki('daily');" value="day">1日</span>
+											</label>
+						
+											<label class="radio-button">
+												<input type="radio" name="radio-price" value="week">
+												<span class="checkmark" id="week" onclick="timeclick_soneki('weekly');" value="week">1週</span>
+											</label>
+						
+											<label class="radio-button">
+												<input type="radio" name="radio-price" value="month">
+												<span class="checkmark" id="month" onclick="timeclick_soneki('monthly');" value="month">1月</span>
+                      </label>
+                      
+                      <label class="radio-button" style="font-size: 10px;" >
+												<input type="radio" name="radio-price" value="other_calendar">
+                        <span class="checkmark" id="other_calendar" onclick="timeclick_soneki('monthly');" value="other_calendar">カスタム
+                          <!-- <vue-ctk-date-time-picker v-model="value" id="app" range></vue-ctk-date-time-picker> -->
+                        </span>
+                      </label>
+                    </div>
+
+                    <div class="radio-buttons">
+						
+											<label class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="minute" checked>
+                        <span id="minute" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">1m</span>
+											</label>
+						
+                      <label class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="minute">
+                        <span id="minute" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">5m</span>
+											</label>
+						
+											<label class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="hours">
+                        <span id="hours" onclick="timing_onclick_chart_bitflyer(periods,this);" value="hours">1h</span>
+                      </label>
+                      
+                      <label class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="day">
+                        <span id="day" onclick="timing_onclick_chart_bitflyer(periods,this);" value="day">1d</span>
+                      </label>
+                      
+                      <label class="radio-button" style="font-size: 10px;">
+                        <input type="radio" name="radio-price_chart" value="other_number">
+                        <span id="other_number" onclick="timing_onclick_chart_bitflyer(periods,this);" value="other_number">カスタム</span>
+                        <div class="dropdow-select">
+                          <p onclick="selectItem('1m')">1m</p>
+                          <p  onclick="selectItem('5m')">5m</p>
+                          <p  onclick="selectItem('15m')">15m</p>
+                          <p  onclick="selectItem('1h')">1h</p>
+                          <p  onclick="selectItem('4h')">4h</p>
+                          <p  onclick="selectItem('1d')">1d</p>
+                          <p  onclick="selectItem('1w')">1w</p>
+                          <p  onclick="selectItem('1M')">1M</p>
+                        </div>
+                      </label>
+                          <template>
+                              <div class="box">
+                                <section>
+                                  <p>date range</p>
+                                  <date-picker v-model="value1" type="date" range placeholder="Select date range"></date-picker>
+                                </section>
+                                <section>
+                                  <p>datetime range</p>
+                                  <date-picker
+                                    v-model="value2"
+                                    type="datetime"
+                                    range
+                                    placeholder="Select datetime range"
+                                  ></date-picker>
+                                </section>
+                              </div>
+                            </template>
+                            <!-- Calendar-->
+                            <script src="https://unpkg.com/vue" charset="utf-8"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/vue-ctk-date-time-picker@1.4.1/dist/vue-ctk-date-time-picker.umd.js" charset="utf-8"></script>
+                        
+                        
+                            <script type="text/javascript">
+                              Vue.component('vue-ctk-date-time-picker', window['vue-ctk-date-time-picker']);
+                              new Vue({
+                                el: '#app',
+                                data () {
+                                  return {
+                                    value: null
+                                  }
+                                }
+                              });
+                            </script>
+                            <script>
+                            export default {
+                              name: 'Range',
+                              data() {
+                                return {
+                                  value1: [new Date(2019, 9, 8), new Date(2019, 9, 19)],
+                                  value2: [],
+                                };
+                              },
+                            };
+                            </script>
+						
+                    </div>
+                </div>
+
+						</br>
+
+					<!-- multiselect: -->
+
+						<div id="app">
+							<multiselect style = "width: 200px; height: 50px;"
+							
+								v-model="value" 
+								:options="options" 
+								:multiple="true"
+								
+								:close-on-select="false" 
+								:clear-on-select="false" 
+								:preserve-search="true" 
+								:custom-label="customLabel"
+								placeholder="4 option selected" 
+								label="name" 
+								track-by="name" 
+								:preselect-first="false"
+								
+							
+								:taggable="false"
+								@close = "onSelect"
+
+							>
+							<div
+								class="selection-count"
+								slot="selection"
+								slot-scope="{ values, search, isOpen, remove }"
+							>
+							<template v-if="!isOpen && values.length">
+									{{ values.length }} options selected
+								</template>
+							</div>	
+							</multiselect>
+							<!-- <pre>{{ value }}</pre> -->
+							<!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
+						</div>
+						
+						<div id = "title">  loading... </div>
+						<canvas id="myChart_soneki_bitmex" ></canvas>
+						
+						<!--<div id="wrapper" style = "margin-left:-20px;margin-right:-20px;margin-top:-20px">
+						</div>
+					-->	
+				</div>
+			</div>
+
+		</div>
+		<div class="card-reveal grey darken-3 white-text" v-bind:style="revealStyleObj">
+			
+			<div class="row" v-bind:style="{height:revealContentHeight+'px'}">		
+			</div>
+		</div>
+	</div>
+		
+</body>	
+<script type="application/javascript">
+let flag = "off";
+let type2 = 'daily';
+var periods_soneki =  1440;
+///DBに保存必要///
+let timing_soneki = "hour";
+let candletotal_soneki = 800;
+
+//calculation
+
+//Get for API_KEY from site 'https://rest.coinapi.io'
+var get_api_key 			= "CD11931F-A6F2-4C4C-9DA2-2D3C6DCB23E2";
+var currentTime 			= new Date();
+var BTCprice_bitmex_array 	= [];
+var BTCprice_bitfly_array 	= [];
+var nowBTCprice_bitmex 		= 0;
+var nowBTCprice_bitfly 		= 0;
+var profit_visible_rows		= 500;
+var premium_data_array		= [];
+var premium_data = [];
+var profit_type_bitmex 		= [];
+var profit_type_bitfly		= [];
+
+var total_result_bitmex;
+var total_result_bitfly;
+var total_fee_bitmex;
+var total_fee_bitfly;
+let final_profit; 	
+
+//soneki のみの変数
+let strategylist_soneki = [];
+let strategylistcomplete_soneki = [];
+var json_soneki_bitmex = [];
+var array_soneki = [];
+var array2_soneki = [];
+var strategyProfit = [];
+var totalProfit = [];
+
+
+var total_sum_bitmex = 0;
+var total_sum_bitfly = 0;
+var total_by_strategy_bitmex = [];
+var total_by_strategy_bitfly = [];
+
+var total_profit_bitfly = [];
+
+let vue_option = [];
+let vue_selected_option = [];
+///multiselect///''
+var total_profit_bitmex = [];
+    //};
+    //$("#strategychoose").multiselect("getChecked");
+    
+
+var title_moji = document.getElementById('title');
+let strategy_selected_array = [];
+
+zero();
+
+async function zero (){
+
+    var firebasegett = await firebaseget();	
+    soneki_first();	
+
+};
+
+
+function soneki_first() {
+    firebase_strategy_list_soneki();
+    var ctx_soneki_bitmex = document.getElementById('myChart_soneki_bitmex').getContext('2d');
+    window.myChart_soneki_bitmex = new Chart(ctx_soneki_bitmex, config_soneki_bitmex);
+    strategylisting_soneki();
+    setSelect_soneki();
+    vue_pulldownstart_soneki();
+    
+    //yaxisinterval2(periods);
+    //$('#strategy_choose_soneki_bitmex').multiselect('selectAll', true);
+    
+    get_btc_currency_array(_fsym="XBTUSD", _e_type="bitmex", _tsym="USD", _limit=profit_visible_rows);
+    
+};
+
+function firebase_strategy_list_soneki(){
+
+    resetstrategy_soneki();
+    var str='';
+    strategy_selected_array = [];
+    //$("#strategy_choose_soneki_bitmex option:selected").each(function(){
+        //console.log($(this).val());
+        console.log("firebaserawdata_bitmex");
+        console.log(firebaserawdata_bitmex);
+        firebaserawdata_bitmex.forEach((item, index) => {
+        
+            //if(item.strategy == this.value) {
+                //time = window.myChart_soneki_bitmex.data.period*1000;
+                //console.log(time);
+                //var converttime = item.t - item.t % time;
+                
+            Bitmex_dealData.push(
+                
+                item
+
+            );
+            
+        //	}
+
+        });
+        
+        
+        //);
+        
+        // firebaserawdata_bitmex.forEach((item, index) => {
+            
+        // 	if(item.strategy == this.value) {
+        // 		//time = window.myChart_soneki_bitmex.data.period*1000;
+        // 		//console.log(time);
+        // 		//var converttime = item.t - item.t % time;
+        // 		Bitfly_dealData.push(
+        // 			item
+        // 		);
+        // 	}
+        // });
+   // });
+    //window.myChart_soneki_bitmex.options.scales.xAxes[0].realtime.duration = setduration;
+    //console.log(json);
+    
+    strategylisting_soneki(this);///いる？
+    //get_period_data(type2); 
+}
+
+function resetstrategy_soneki(){
+
+    //originalinformaion = [];
+    arr1 = [];
+    Bitmex_dealData = [];
+    //window.myChart_soneki_bitmex.data.datasets = [];
+    final_profit = 0;
+    //window.myChart_soneki_bitmex.data.array= [];
+
+
+};
+
+
+var premiumData = [];
+
+
+function timeclick(type){
+
+    delete window.myChart_soneki_bitmex.data.datasets;
+    window.myChart_soneki_bitmex.data.array= [];
+    window.myChart_soneki_bitmex.data.datasets= [];
+    resetstrategy_soneki();
+    setSelect_soneki();
+    flag =	"off";
+    //start_calc_func();
+    //get_period_data(window.myChart_soneki_bitmex.period);
+    //strategychoose_soneki();
+    //get_period_data(type);
+    //get_period_data(type);
+    get_period_data(type);
+
+}
+
+function vue_pulldownstart_soneki(){
+    //$('#strategychoose ').prop("select", true);
+    // Checks all checkboxes.          
+    
+    new Vue({
+            components: {
+            Multiselect: window.VueMultiselect.default
+            },
+            data: {
+            value: '',
+            options: vue_option,
+            displayDropdown: false,
+            },
+        methods: {
+            customLabel (option) {
+            return `${option.name} `
+            },
+            onSelect (option, id) {
+                
+                console.log(option, id);
+                for ( var i in option ) 
+                    {
+                        vue_selected_option.push(option[i].name);
+                        strategy_selected_array.push(option[i].name);//ここ直す必要あり
+                    }
+                    delete window.myChart_soneki_bitmex.data.datasets;
+
+                window.myChart_soneki_bitmex.data.array= [];
+                window.myChart_soneki_bitmex.data.datasets= [];
+                resetstrategy_soneki();
+                setSelect_soneki();
+                flag =	"off";
+                start_calc_func();
+                //get_period_data(window.myChart_soneki_bitmex.period);
+                // strategychoose_soneki();
+                get_period_data(window.myChart_soneki_bitmex.period);
+
+            }
+        }
+    }).$mount('#app')
+    // $(getelement).multiselect({
+        
+    // 	enableClickableOptGroups: true,
+    // 	enableCollapsibleOptGroups: true,
+    // 	enableFiltering: true,
+    // 	includeSelectAllOption: true,
+    // 	maxHeight: 600,
+    // 	onDropdownHide: function(event) {
+    // 		//alert('Dropdown closed.');
+    // 		// to reload the page
+    // 		//location.reload();  
+    // 		delete window.myChart_soneki_bitmex.data.datasets;
+    // 		window.myChart_soneki_bitmex.data.array= [];
+    // 		window.myChart_soneki_bitmex.data.datasets= [];
+    // 		resetstrategy_soneki();
+    // 		setSelect_soneki();
+    // 		flag =	"off";
+    // 		start_calc_func();
+    // 		//get_period_data(window.myChart_soneki_bitmex.period);
+    // 		strategychoose_soneki();
+    // 		get_period_data(window.myChart_soneki_bitmex.period);
+            
+    // 	}
+    // }); 
+};	
+    
+
+
+
+// function calculation_soneki_start{	
+    let flag2 = "off";
+    ///strategy lisrt の
+function setSelect_soneki()
+{
+
+    // 入力ボックスの値を取得
+    //var id = document.getElementById("strategy_choose_soneki_bitmex");
+    
+    console.log(flag2);
+    
+    
+    if (flag2 == "off"){
+        for ( var i in strategylistcomplete_soneki ) 
+        {
+
+            vue_option.push(
+
+                {name:strategylistcomplete_soneki[i],
+                language:strategylistcomplete_soneki[i],}
+
+            )
+
+            // console.log("startingg");
+            // var element = document.createElement('option');
+            // element.setAttribute('value', strategylistcomplete_soneki[i]);
+            // element.setAttribute('selected', true);
+            // element.innerHTML = strategylistcomplete_soneki[i];
+            // console.log("element");
+            // console.log(element);
+            // id.appendChild(element);
+            
+        }
+    }
+    console.log(vue_option)
+    flag2 = "on";
+    //multiselect();
+};
+
+
+
+function get_btc_currency_array(_fsym="XBTUSD", _e_type="bitmex", _tsym="USD", _limit=500) {
+
+    let fsym 	= 	_fsym;
+    let e_type	=	_e_type;
+    let tsym	=	_tsym;
+    let limit	=	_limit;
+
+    var btc_currency = [];
+    
+
+    //if bitmex,   address is 	: https://min-api.cryptocompare.com/data/histohour?fsym=XBTUSD&e=bitmex&tsym=USD&limit=500
+    //if bitflyer, address is 	: https://min-api.cryptocompare.com/data/histohour?fsym=BTC&e=bitflyerfx&tsym=JPY&limit=500
+    url ='https://min-api.cryptocompare.com/data/histohour?'  +
+                                    'fsym='  + fsym 	+ '&' +
+                                    'e=' 	 + e_type 	+ '&' +
+                                    'tsym='  + tsym 	+ '&' +
+                                    'limit=' + limit;
+    fetch(url)
+    .then(function(response) {
+        console.log("FETCHINGGGGGGGGGGGGG")
+        return response.json();
+    })
+    .then(function(jsonObj) {
+        Array.prototype.forEach.call(jsonObj.Data, child => {
+            btc_currency.push({
+                t:new Date(child.time*1000),
+                o:child.open,
+                h:child.high,
+                l:child.low,
+                c:child.close
+            })
+        })
+        console.log("btc_currency");
+        console.log(btc_currency);
+        if(_e_type == "bitmex"){
+            BTCprice_bitmex_array = btc_currency;
+            nowBTCprice_bitmex = get_nowBTCprice(BTCprice_bitmex_array); 
+            // * 100;
+            get_btc_currency_bitfly_array();
+        }else{
+            BTCprice_bitfly_array = btc_currency;
+            nowBTCprice_bitfly = get_nowBTCprice(BTCprice_bitfly_array);
+            get_premiumData();
+        }
+    })
+    
+    
+    
+    
+
+}
+
+    function get_nowBTCprice(btc_currency_array){
+
+        var nowBTCprice = 0;
+        for(index in btc_currency_array)
+        {
+            if(currentTime.getTime() < btc_currency_array[index].time)
+            {
+                nowBTCprice = btc_currency_array[index-1].h;
+                break;
+            }
+            else
+            {
+                nowBTCprice = btc_currency_array[index].h;
+            }
+        }
+        return nowBTCprice;
+    }
+
+    //get_bitmex_info
+    
+    //get_bitflyer_info
+    function get_btc_currency_bitfly_array(){
+
+        get_btc_currency_array(_fsym="BTC", _e_type="bitflyer", _tsym="JPY", _limit=profit_visible_rows);
+    
+    }
+
+    //get_premiumData_info
+    function get_premiumData(){
+
+    let api_key 	= get_api_key;
+    let time_start 	= "2019-01-10T00:00:00.0000000";//time_start_api();//"2019-01-10T00:00:00.0000000Z";//"20190815";		
+    let url 		= "https://rest.coinapi.io/v1/ohlcv/BITMEX_IDX_XBTUSDPI8H/history?apikey=" + api_key + "&period_id=8HRS&time_start=" + time_start + "Z&limit=10000";
+
+    premium_data 	= [];
+    is_uploading 	= 1;
+
+    fetch(url)
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(jsonObj) {
+
+        Array.prototype.forEach.call(jsonObj, child => {
+            premium_data.push({
+                s:child.time_period_start,
+                t:child.time_period_end,
+                o:child.price_open,
+                h:child.price_high,
+                l:child.price_low,
+                c:child.price_close
+            })
+        })
+        premium_data_array = premium_data;
+        
+    }).then(function(){
+
+        console.log("premiumdata");
+        console.log(premium_data);
+
+        //soneki_first();
+
+    }).then(function(){
+        console.log("start_calc_func")	;
+        start_calc_func();
+
+    })
+        
+}
+
+    //calcuulate_Profid
+    function calculateProfit(data, timePrice, type){
+
+    //Sorting array of dealData by strategy and time
+    data.sort(function(a, b) {
+        if (a["strategy"] > b["strategy"]) 	return  1;
+        if (a["strategy"] < b["strategy"]) 	return -1;
+        if (a["t"] > b["t"]) 				return  1;
+        if (a["t"] < b["t"]) 				return -1;
+
+    });
+    console.log(data);
+    //Getting groub's result array of dealData by strategy
+    var result = data.reduce( (acc, obj) => {
+        acc[obj.strategy] = acc[obj.strategy] || [];
+        acc[obj.strategy].push(obj);
+        return acc;
+    }, {});
+    var totalProfit = [];
+    var temp = [];
+    //Circling by strategy
+    for (strategy in result){
+        var strategyProfit = [];
+        var lotplusminus   = 0;
+        var strategyTotalProfit = 0;
+        //Circling by timeData
+        for (timeInd in timePrice){
+            var profitVal 	= 0;
+            
+            var time 		= timePrice[timeInd].t;
+            var minTime 	= (timeInd == 0)?0:timePrice[timeInd-1].t;
+
+            var feeVal = 0;
+            
+            //Circling by dealData per strategy
+            for (dataTimeInd in result[strategy]){
+                //written each time that is written in the secondarray"t"
+                //if (result[strategy][dataTimeInd].t > time) continue;
+                if (compareTimeStamp(result[strategy][dataTimeInd].t, time) > 0) continue;
+                //calcultate the lot for "buy" is.
+                if (result[strategy][dataTimeInd].buysell == "buy"){
+                    lotplusminus += result[strategy][dataTimeInd].lot;
+                    profitVal 	  = profitVal - result[strategy][dataTimeInd].lot * 
+                                    ((result[strategy][dataTimeInd].price / timePrice[timeInd].h)-1);
+                //calcultate the lot for "sell" is -.	
+                }else{
+                    lotplusminus -= result[strategy][dataTimeInd].lot;
+                    profitVal  	  = profitVal + result[strategy][dataTimeInd].lot * 
+                                    ((result[strategy][dataTimeInd].price / timePrice[timeInd].h)-1);
+                }
+                feeVal += result[strategy][dataTimeInd].fee;
+            }
+            //get profitVal's data by timeData
+            profitVal = Math.round(profitVal * 1000) / 1000;
+            
+            //feeVal = getFeeForTime(time, type);
+            strategyProfit.push({x: time, y: profitVal + feeVal});
+            timeVal = new Date(time).getTime();
+            temp[timeVal] = profitVal + feeVal + (temp[timeVal]?temp[timeVal]:0);
+            total_sum_bitmex += profitVal + feeVal;
+            strategyTotalProfit += profitVal + feeVal;
+        }
+        //get profitVal's table data by timeData
+        
+        totalProfit.push({title:strategy, res:strategyProfit});
+        //totalProfit.push({title:strategy+type, res:strategyProfit});
+        strategyTotalProfit = parseInt(strategyTotalProfit * 1000) / 1000;
+        total_by_strategy_bitmex.push({title:strategy, total_profit:strategyTotalProfit});
+        
+        if(type=="-bitmex") profit_type_bitmex.push("profit_" + strategy);	
+        else profit_type_bitfly.push("profit_" + strategy);	 
+        
+        //if(type=="-bitmex") profit_type_bitmex.push("profit_" + strategy + type);	
+        //else profit_type_bitfly.push("profit_" + strategy + type);	
+
+    }
+    console.log("profit_type_bitmex");
+    console.log(profit_type_bitmex);
+
+    for (temp_key in temp){
+        
+        total_profit_bitmex.push({x:new Date(parseInt(temp_key)), y:temp[temp_key]});
+    }
+
+    return totalProfit;
+    }
+
+    function getBitFlyProfit(data, timePrice){
+    data.sort(function(a, b) {
+        if (a["strategy"] > b["strategy"]) return 1;
+        if (a["strategy"] < b["strategy"]) return -1;
+        if (a["t"] > b["t"]) return 1;
+        if (a["t"] < b["t"]) return -1;
+    });
+    // If he needs separate array
+    var result = data.reduce( (acc, obj) => {
+        acc[obj.strategy] = acc[obj.strategy] || [];
+        acc[obj.strategy].push(obj);
+        return acc;
+    }, {});
+
+    var totalProfit = [];
+    var temp = [];
+
+    for (strategy in result){
+        var strategyProfit = [];
+        var lotplusminus = 0;
+        strategyTotalProfit = 0;
+        
+        for (timeInd in timePrice){
+            var profitVal = 0;
+            var time = timePrice[timeInd].t;
+            var minTime = (timeInd == 0)?0:timePrice[timeInd - 1].t;
+            for (dataTimeInd in result[strategy]){
+                if (result[strategy][dataTimeInd].t > time){
+                    continue;
+                }
+
+                if (result[strategy][dataTimeInd].buysell == "buy"){
+                    lotplusminus += result[strategy][dataTimeInd].lot;
+                    profitVal = profitVal - result[strategy][dataTimeInd].lot * (result[strategy][dataTimeInd].price - timePrice[timeInd].h);
+                    
+                }else{
+                    lotplusminus -= result[strategy][dataTimeInd].lot;
+                    profitVal = profitVal + result[strategy][dataTimeInd].lot * (result[strategy][dataTimeInd].price - timePrice[timeInd].h);
+                }
+            }
+            profitVal = Math.round(profitVal * 1000) / 1000;
+            strategyProfit.push({x: time, y: profitVal});
+            total_sum_bitfly += profitVal;
+            strategyTotalProfit += profitVal;
+            timeVal = new Date(time).getTime();
+            temp[timeVal] = profitVal + (temp[timeVal]?temp[timeVal]:0);
+        }
+        strategyTotalProfit = parseInt(strategyTotalProfit * 1000) / 1000;
+        total_by_strategy_bitfly.push({title:strategy, total_profit:strategyTotalProfit});
+        totalProfit.push({title:strategy, res:strategyProfit});
+    }
+    for (temp_key in temp){
+        total_profit_bitfly.push({x:new Date(parseInt(temp_key)), y:temp[temp_key]});
+    }
+    return totalProfit;
+    }
+
+    function getFeeForTime(time, type){
+    var currTime = new Date(time);
+    var unixStp = currTime.getTime();
+    var feeForTime = 0;
+    if (type == "-bitmex"){
+        var i = 0;
+        var feeTime = new Date(total_fee_bitmex[i].time);
+        var feeUnixStp = feeTime.getTime();
+        while (feeUnixStp < unixStp){
+            feeForTime = total_fee_bitmex[i].total_fee;
+            i++;
+            if (i == total_fee_bitmex.length)
+                break;
+            feeTime = new Date(total_fee_bitmex[i].time);
+            feeUnixStp = feeTime.getTime();
+        }
+        return parseFloat(feeForTime);
+    }else{
+        var i = 0;
+        var feeTime = new Date(total_fee_bitfly[i].time);
+        var feeUnixStp = feeTime.getTime();
+        while (feeUnixStp < unixStp){
+            feeForTime = total_fee_bitfly[i].total_fee;
+            i++;
+            if (i == total_fee_bitfly.length)
+                break;
+            feeTime = new Date(total_fee_bitfly[i].time);
+            feeUnixStp = feeTime.getTime();
+        }
+        return parseFloat(feeForTime);
+    }
+    }
+
+    //start_nain_prog
+    function start_calc_func(){
+        console.log("bitmex_dealdata");
+        
+    if (Bitmex_dealData.length > 0){
+        total_fee_bitmex = calculateBitmexFee(Bitmex_dealData, premium_data_array, currentTime);	
+        total_result_bitmex = calculateProfit(Bitmex_dealData, BTCprice_bitmex_array, '-bitmex');
+    }
+    
+    console.log("BTCprice_bitmex_array");
+    console.log(BTCprice_bitmex_array);
+    console.log("Bitmex_dealData")
+    console.log(Bitmex_dealData);
+    console.log("total_result_bitmex");
+    console.log(total_result_bitmex);
+    console.log("bitfly_dealdata");
+    if (Bitfly_dealData.length > 0){
+        total_fee_bitfly = calculateBitflyFee(Bitfly_dealData, premium_data_array, currentTime);	
+        total_result_bitfly = getBitFlyProfit(Bitfly_dealData, BTCprice_bitfly_array);
+    }
+
+    total_sum_bitmex = parseInt(total_sum_bitmex * 1000) / 1000;
+    total_sum_bitfly = parseInt(total_sum_bitfly * 1000) / 1000;
+
+    console.log("---------- Total Profit for BitMex -----------------");
+    console.log(total_sum_bitmex);
+
+    console.log("---------- Total Profit for BitFly -----------------");
+    console.log(total_sum_bitfly);
+
+    console.log("---------- Total Profit by Strategy for BitMex ------------");
+    console.log(total_by_strategy_bitmex);
+    console.log("---------- Total Profit by Strategy for BitFly ------------");
+    console.log(total_by_strategy_bitfly);
+
+    console.log("--------- Total overall profit for bitmex ----------------");
+    console.log(total_profit_bitmex);
+    console.log("--------- Total overall profit for bitfly ----------------");
+    console.log(total_profit_bitfly);
+
+    get_period_data("daily");
+
+    }
+
+    //Interest Rate
+    function calculateInterestRate(us_rate = 0.06, btc_rate = 0.03) {
+
+    return (us_rate - btc_rate)/3;
+
+    }
+
+    /*************************************************************
+    title : time compare
+    description
+        this is showing deference of two taimes(big, small)
+        if flag is false, the deference calculate in mili second
+        else the deference calculate in day
+    ***************************************************************/
+    function compareTimeStamp(big, small, flag = false){
+
+    var next_t = new Date(small);	
+        //next_t.setHours( next_t.getHours() + 9 );
+
+    if(flag == false) 
+        return (new Date(big) - next_t); 
+    else 
+        return ((new Date(big) - next_t) + 3600000); 
+    }
+
+    //convert to time stampt
+    function toTimeStamp(strDate){
+
+    var datum = Date.parse(strDate);		 
+    return datum/1000;
+    }
+
+    //Premium Array for deal 
+    //Premium Index (P) = (Max(0, Impact Bid Price - Mark Price) - Max(0, Mark Price - Impact Ask Price)) / Spot Price + Fair Basis used in Mark Price
+    function getPremiumArray(time, currentTime) {
+
+    var filterData  = [];
+
+    var start = 0;
+    for(index in premium_data_array)
+    {
+        if(start == 1 && compareTimeStamp(currentTime, premium_data_array[index].t) > 0)
+        {
+            filterData.push(premium_data_array[index].h * 100);
+        }
+        
+        if( compareTimeStamp(premium_data_array[index].t, time) 				> 0 	&& 
+            compareTimeStamp(time, premium_data_array[index].s) 				> 0 	&& 
+            compareTimeStamp(currentTime, premium_data_array[index].o, true) 	> 0	)
+        {
+            filterData.push(premium_data_array[index].h * 100);
+            start = 1;
+        }
+    }
+    return filterData;
+    }
+
+    //Number Clamps in JavaScript
+    function Clamp(min,mid,max){
+
+    if (min < mid && mid < max) return mid;
+        else if (mid < min) return min;
+            else if (max < mid) return max;	
+                    
+    }
+
+    // Fee calculateBitmexFee
+    function calculateBitmexFee(data, premiumData, currentTime) {
+
+    var dealFee 		= [];
+    var fixed_fee 		= 0;
+    var funding_fee 	= 0;
+    var bitflyer_fee 	= 0;
+    var interest_rate 	= 0;
+    var total_fee 		= 0;
+    var nowBTCprice 	= nowBTCprice_bitmex;
+
+    for(objIndex in data)
+    {
+        //fixed_fee = data[objIndex].lot * ( nowBTCprice / data[objIndex].price ) * ((data[objIndex].type == "market")?(-0.0250):(0.0750));
+
+        /******************************************************************************************************************************
+            title : FundingRate fee (every 8 changes)
+            description
+                first（lot * nowBTCprice/boughtBTCprice * FR ） +  add (lot * nowBTCprice/boughtBTCprice *FR(for every 8hours changed)）	
+
+                there nowBTCprice and boughtBTCprice is calculated as following.
+                    nowBTCprice is btc_currency[btc_currency.length-1]['high']
+                    boughtBTCprice is data[objIndex].price				
+        *******************************************************************************************************************************/
+        interest_rate 		= calculateInterestRate();
+        var premiumArray 	= getPremiumArray( data[objIndex].t, currentTime );
+
+        if(premiumArray.length > 0)
+        {
+            for(premiumIndex in premiumArray)
+            {
+                var fr 		 = premiumArray[premiumIndex] + 
+                            Clamp( -0.05, interest_rate - premiumArray[premiumIndex], 0.05 );
+                funding_fee += data[objIndex].lot * (nowBTCprice / data[objIndex].price) * fr;
+            }
+            //total_fee = Math.round((funding_fee + fixed_fee) * 1000) / 1000;	
+            total_fee = Math.round(funding_fee * 1000) / 1000;	
+
+        }
+        else
+        {
+            total_fee = 0;
+        }
+
+        /**********************************************************************************************************
+            title : Total fee
+            description
+                SUM(Maker & taker fee, FundingRate fee (every 8 changes), Bitflyer fee (every 24 hours)) by deal
+                Push this value to total_fee.
+        **********************************************************************************************************/	
+        
+        dealFee.push({time: data[objIndex].t, total_fee: total_fee});
+
+        // var initial
+        //fixed_fee 		= 0;
+        bitflyer_fee 	= 0;
+        funding_fee 	= 0;
+        total_fee 		= 0;
+    }
+        console.log("dealFee");
+        return dealFee;
+    }
+
+    // Fee calculateBitflyFee
+    function calculateBitflyFee(data, premiumData, currentTime) {
+
+    var dealFee 		= [];
+    var fixed_fee 		= 0;
+    var funding_fee 	= 0;
+    var bitflyer_fee 	= 0;
+    var interest_rate 	= 0;
+    var total_fee 		= 0;
+    var nowBTCprice 	= nowBTCprice_bitmex;
+
+    for(objIndex in data)
+    {		
+            
+        var timeDiff 	= parseInt( compareTimeStamp( currentTime, data[objIndex].t ) / 3600000 );
+        bitflyer_fee   -= timeDiff * ( data[objIndex].lot * data[objIndex].price * 0.04 );
+        bitflyer_fee 	= Math.round( bitflyer_fee * 1000 ) / 1000;
+        total_fee 		= bitflyer_fee;
+
+        /**********************************************************************************************************
+            title : Total fee
+            description
+                SUM(Maker & taker fee, FundingRate fee (every 8 changes), Bitflyer fee (every 24 hours)) by deal
+                Push this value to total_fee.
+        **********************************************************************************************************/	
+
+        dealFee.push({time: data[objIndex].t, total_fee: total_fee});
+
+        // var initial
+        fixed_fee 		= 0;
+        bitflyer_fee 	= 0;
+        funding_fee 	= 0;
+        total_fee 		= 0;
+    }
+    return dealFee;
+    }
+
+    // });
+
+    function get_period_data(type){
+    window.myChart_soneki_bitmex.period = type;	
+    
+    var currTimeStamp = new Date().getTime();
+    final_profit = 0;
+    var beginningTimeStamp;
+    let bitmex_period_data = [];
+    let bitfly_period_data = [];
+    let total_bitmex_period_data = [];
+    let total_bitfly_period_data = [];
+    var temp = [];
+
+    if (type == 'daily'){
+    beginningTimeStamp = currTimeStamp - 3600000 * 24;
+    }else if (type == 'weekly'){
+    beginningTimeStamp = currTimeStamp - (3600000 * 24) * 7;
+    }else if (type == 'monthly'){
+    beginningTimeStamp = currTimeStamp - (3600000 * 24) * 30;
+    }
+    console.log("total_result_bitmex");
+    console.log(total_result_bitmex);
+    
+    for (bit_strategy_ind in total_result_bitmex){
+    var strategy_period_data = [];
+    var bit_strategy = total_result_bitmex[bit_strategy_ind];
+
+    var i = bit_strategy.res.length - 1;
+    var data_time = new Date(bit_strategy.res[i].x).getTime();
+    while (data_time > beginningTimeStamp){
+        strategy_period_data.unshift({x: bit_strategy.res[i].x, y: bit_strategy.res[i].y});
+        //strategy_period_data.unshift(bit_strategy.res[i]);
+        temp[data_time] = (temp[data_time]?temp[data_time]:0) + bit_strategy.res[i].y;
+        if (i > 0){
+            data_time = new Date(bit_strategy.res[--i].x).getTime();
+        }else{
+            data_time = data_time - 3600000;
+            break;
+        }
+    }
+    var offset = strategy_period_data[0].y;
+    for (i = 0; i< strategy_period_data.length; i++){
+        strategy_period_data[i].y -= offset;
+        data_time = new Date(strategy_period_data[i].x).getTime();
+        temp[data_time] = temp[data_time] - offset;
+    }
+
+    bitmex_period_data.push({title: bit_strategy.title, res: strategy_period_data});
+    }
+    for (temp_key in temp){
+    total_bitmex_period_data.unshift({x:new Date(parseInt(temp_key)), y:temp[temp_key]});
+    }
+
+    temp = [];
+    for (bit_strategy_ind in total_result_bitfly){
+    var strategy_period_data = [];
+    var bit_strategy = total_result_bitfly[bit_strategy_ind];
+
+    var i = bit_strategy.res.length - 1;
+    var data_time = new Date(bit_strategy.res[i].x).getTime();
+    while (data_time > beginningTimeStamp){
+        strategy_period_data.unshift({x: bit_strategy.res[i].x, y: bit_strategy.res[i].y});
+        //strategy_period_data.unshift(bit_strategy.res[i]);
+        temp[data_time] = (temp[data_time]?temp[data_time]:0) + bit_strategy.res[i].y;
+        if (i > 0){
+            data_time = new Date(bit_strategy.res[--i].x).getTime();
+        }else{
+            data_time = data_time - 3600000;
+            break;
+        }
+    }
+    var offset = strategy_period_data[0].y;
+    for (i = 0; i< strategy_period_data.length; i++){
+        strategy_period_data[i].y -= offset;
+        data_time = new Date(strategy_period_data[i].x).getTime();
+        temp[data_time] = temp[data_time] - offset;
+    }
+    bitfly_period_data.push({title: bit_strategy.title, res: strategy_period_data});
+    }
+    for (temp_key in temp){
+    total_bitfly_period_data.unshift({x:new Date(parseInt(temp_key)), y:temp[temp_key]});
+    }
+
+    
+    if(flag == "on")
+    {   
+
+        console.log("bitmex_period_data");
+        console.log(bitmex_period_data);
+        //list_to_chart_total(total_bitmex_period_data, "BitMEX全損益"); 
+        list_to_chart(bitmex_period_data, false);
+        console.log(window.myChart_soneki_bitmex.data.datasets);
+
+    }
+    if(flag == "off")
+    {
+        
+        console.log("!total_bitmex_period_data");
+        console.log(flag);
+        flag = "on";
+        list_to_chart_total(total_bitmex_period_data, "BitMEX全損益");
+console.log(total_bitmex_period_data);
+        console.log(window.myChart_soneki_bitmex.data.datasets);
+       
+    }
+    // console.log("------------------- Total overall profit for bitmex daily ---------------");
+    // console.log(total_bitmex_period_data);
+    // console.log("------------------- Total overall profit for bitfly daily ---------------");
+    // console.log(total_bitfly_period_data);
+
+    // console.log("------------------ BitMex For " + type + " --------------");
+    // console.log(bitmex_period_data);
+    // console.log("------------------ BitMex For " + type + " --------------");
+    // console.log(bitfly_period_data);
+
+
+
+    //list_to_chart(bitfly_period_data, true);
+    
+    //list_to_chart_total(total_bitfly_period_data, "bitFlyer");
+
+
+    function list_to_chart(array,true_or_false){
+
+            array.forEach(element => {
+
+                console.log("strategy_selected_array.indexOf(array.title)");
+                console.log(strategy_selected_array);
+                console.log(strategy_selected_array.indexOf(element.title));
+                if (strategy_selected_array.indexOf(element.title) >= 0){
+                    
+                    window.myChart_soneki_bitmex.data.datasets.push({
+
+                        pointRadius: 0,
+                        label: element.title,
+                        hidden: true_or_false,
+                        lineTension: 0,
+                        borderWidth:1,
+                        
+                        //borderDash: [8, 4],
+                        data: element.res,
+                        // datalabels: {
+                        // 	display: true
+                        // },
+
+                    })
+                };
+            });	
+
+    }
+
+
+    function list_to_chart_total(array,label_name){
+                
+            window.myChart_soneki_bitmex.data.datasets.push({
+
+                pointRadius: 0,
+                label: label_name,
+                lineTension: 0,
+                //hidden: false,
+                borderWidth:1,
+                //borderDash: [8, 4],
+                data: array,
+                // datalabels: {
+                // 	display: true
+                // },
+
+            })
+
+        }
+    
+
+
+    Chart.helpers.merge(Chart.defaults.global, {
+        aspectRatio: 4 / 3,
+        tooltips: false,
+        layout: {
+            padding: {
+                bottom: 25,
+                right: 50,
+                left: 25,
+                top: 50
+            }
+        },
+        elements: {
+            line: {
+                fill: false
+            }
+        },
+        plugins: {
+            legend: false,
+            title: false
+        }
+    });	
+        
+        final_profit =Math.round(total_bitmex_period_data[total_bitmex_period_data.length-1].y*100)/100;
+        // final_profit = Math.round(final_profit * 1000) / 1000;
+        console.log(final_profit);
+        console.log("window.myChart_soneki_bitmex.period");
+        console.log(window.myChart_soneki_bitmex.period);
+
+
+        
+        if(window.myChart_soneki_bitmex.period == "daily")
+        {
+
+            title_moji.innerHTML = '<p1> 日次損益：$ </p1>' + '<p1 style = "font-size:20px"> '+final_profit  + '</p1>';
+            
+        }
+        if(window.myChart_soneki_bitmex.period == "weekly")
+        {
+            //var title_moji = document.getElementById('title');
+            title_moji.innerHTML = '<p1> 日次損益：$ </p1>' + '<p1 style = "font-size:20px"> '+final_profit  + '</p1>';
+        
+        }
+        if(window.myChart_soneki_bitmex.period == "monthly")
+        {
+            //var title_moji = document.getElementById('title');
+            title_moji.innerHTML = '<p1> 日次損益：$ </p1>' + '<p1 style = "font-size:20px"> '+final_profit  + '</p1>';
+            
+        
+        }
+
+        //delete window.myChart_soneki_bitmex.options.title.text 
+        window.myChart_soneki_bitmex.update();
+        
+
+    }
+    
+
+
+function strategylisting_soneki(delet){
+
+    
+
+    //window.myChart_soneki_bitmex.data.datasets[0].datalabels.align = [];
+    
+ 
+    if (!delet){
+
+        json_soneki_bitmex = firebaserawdata_bitmex;
+        console.log(firebaserawdata_bitflyer);
+        console.log(firebaserawdata_bitmex);
+        console.log(json_soneki_bitmex);
+        console.log("nodelete");
+    }
+    else{
+
+        // window.myChart_soneki_bitmex.data.array= [];
+        // window.myChart_soneki_bitmex.data.datasets[0]= [];
+
+
+    }
+    //window.myChart_soneki_bitmex.data.datalabels.align = upbottom;
+    ///strategy のリスト作り
+    strategylist_soneki = json_soneki_bitmex.map(function(num) {
+        if(num){
+            return num.strategy;
+        }
+    });
+    
+    strategylistcomplete_soneki = [...new Set(strategylist_soneki)];
+    console.log(strategylistcomplete_soneki);
+    
+    function IsArrayExists(array, value) {
+        // 配列の最後までループ
+    
+        for (var i =0, len = array.length; i < len; i++) {
+            
+            if (value == array[i].x) {
+            // 存在したらtrueを返す
+        
+
+            return true;
+            }
+        }
+        // 存在しない場合falseを返す
+        return false;
+    
+    }
+    
+    //console.log(strategyProfit); 
+   // window.myChart_soneki_bitmex.update();
+
+};
+    
+
+    var config_soneki_bitmex = {
+        period:type2,
+        type: 'line',
+        data: {
+            array: array_soneki,
+            array2: array2_soneki,
+            period:periods_soneki,
+            //fillColor:"upcolor",
+            datasets: [],
+        },
+        
+        options: { 
+            
+            
+            tooltips: { 
+            
+                enabled: false, 
+                //intersect: true,
+                position: "nearest",
+                mode:"nearest"
+    
+            },
+                            
+            maintainAspectRatio: false,
+                    
+            layout: {
+                padding: {
+
+                    left: -5,
+                    right: 0,
+                    top: 0,
+                    bottom: -10
+                        }
+                    },		
+            title: {
+                display: false,
+                fontColor: "white",
+                text: "loading...",
+                fontSize: 30
+                
+            },
+            legend: {
+
+                display: false,
+                labels: {
+                    fontColor: "white",
+                }
+                
+
+            },
+            hover: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                yAxes:[{
+                    stacked: false,
+                    gridLines: {
+                        color: 'rgba(42,46,57,1)',
+                        lineWidth: 1
+                    },
+                    id:'y-axis-0',
+                    ticks: {
+
+                        fontColor: "white",
+                    
+                    }
+                }],
+                xAxes: [{
+                    stacked: true,
+                    gridLines: {
+                        color: 'rgba(42,46,57,1)',
+                        lineWidth: 1
+                    },
+                    id:"normal",
+                    type:"time",
+                    ticks: {
+
+                        fontColor: "white",
+
+                    },
+                    type:'time',
+                    time: {
+                        //format: "HH:mm",
+                        minUnit:'second',
+                        displayFormats: {
+                            second: 'HH:mm:ss',
+                            minute: 'HH:mm',
+                            hour: 'MMM D, HH:mm'
+                        }
+                        //min: 1471174953000,
+                        //max: 1473853353000
+                       
+                    },
+                
+                },
+                    {
+                    id:"order",
+                    //display: false,
+                    ticks: {
+                        //beginAtZero: true,
+                    // min: minPriceSize,
+                    // max: maxPriceSize
+                    },
+                    //type: 'linear',
+                    //barPercentage: 1,
+                    
+                    },
+                                        
+                ],
+            
+            },
+
+            plugins: { 
+
+                streaming: false,
+                    
+                   colorschemes: {
+
+                    scheme: "office.BlueII6",
+                    override:true
+                },
+
+                datalabels: {
+                    backgroundColor: function(context) {
+                        
+                        if(context.dataset._meta[0]){
+                            
+                        return context.active ? context.dataset._meta[0].dataset._model.backgroundColor : "rgba(100, 100, 100, 0)";
+                        }
+                        if(context.dataset._meta[1]){
+                            
+                        return context.active ? context.dataset._meta[1].dataset._model.backgroundColor : "rgba(100, 100, 100, 0)";
+                        }
+                        if(context.dataset._meta[2]){
+                    
+                        return context.active ? context.dataset._meta[2].dataset._model.backgroundColor : "rgba(100, 100, 100, 0)";
+                        }
+                    },
+                    borderColor: function(context) {
+                    
+                        if(context.dataset._meta[0]){
+                        return context.active ? context.dataset._meta[0].dataset._model.backgroundColor : "rgba(100, 100, 100, 0)";
+                        }
+                        if(context.dataset._meta[1]){
+                        return context.active ? context.dataset._meta[1].dataset._model.backgroundColor : "rgba(100, 100, 100, 0)";
+                        }
+                        if(context.dataset._meta[2]){
+                        return context.active ? context.dataset._meta[2].dataset._model.backgroundColor : "rgba(100, 100, 100, 0)";
+                        }
+                    },
+                    borderRadius: function(context) {
+                        return context.active ? 6 : 32;
+                    },
+                    //borderWidth: 1,
+                    
+                    color: function(context) {
+                        return context.active ? "white" : "rgba(100, 100, 100, 0)";
+                    },
+                    font: {
+                        weight: 'bold',
+                        //color:"white"
+                    },
+                    formatter: function(value, context) {
+                        value = Math.round(value * 100) / 100;
+                        //console.log(context);
+                        return context.dataset.label + '\n' + "$" + Math.round(context.dataset.data[context.dataIndex].y*100 )/100
+                            // : Math.round(context.dataset.data[context.dataIndex].y);
+                            
+                    },
+                    offset: 8,
+                    textAlign: 'center'
+                }
+            
+                // datalabels: {
+
+                // 	//padding: 50,
+                // 	//opacity:50,
+                //     backgroundColor: "transparent",							
+                //     borderRadius: 4,
+                // 	//align:'end',
+                // 	//offset: 5,
+                //     clip: true,
+                //     color: "white",
+                //     font: {
+                //         weight: 'bold'
+                //     },
+                //     formatter: function(value, context) {
+                        
+                //         //return  context.chart.data.array[context.dataIndex];
+                        
+                //     }
+        
+                // },
+            
+               
+            }
+        }
+    };
+    function selectItem(item) {
+      var item;
+      document.getElementById('other_number').innerHTML = item;
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync('.radio-button input[type=radio]:checked ~ .dropdow-select {display: none}');
+      document.adoptedStyleSheets = [sheet];
+      var style = document.createElement('style');
+      document.head.appendChild(style);
+      style.sheet.insertRule('#other_number {font-size: 15px}');
+    }
+
+
+</script>
+</html>
+
