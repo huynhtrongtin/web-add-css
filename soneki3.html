@@ -307,54 +307,53 @@ var firebaseConfig = {
 
 										<div class="radio-buttons">
                       
-											<label class="radio-button">
-												<input type="radio" name="radio-price" value="day" checked>
-                        <span class="checkmark" id="day" onclick="timeclick_soneki('daily');" value="day">1日</span>
-											</label>
+											<div class="radio-button">
+												<input type="radio" name="radio-price" value="day" id="day" checked>
+                        <label for="day" class="checkmark" onclick="timeclick_soneki('daily');" value="day">1日</label>
+                      </div>
 						
-											<label class="radio-button">
-												<input type="radio" name="radio-price" value="week">
-												<span class="checkmark" id="week" onclick="timeclick_soneki('weekly');" value="week">1週</span>
-											</label>
+											<div class="radio-button">
+												<input type="radio" name="radio-price" value="week" id="week">
+												<label for="week" class="checkmark" onclick="timeclick_soneki('weekly');" value="week">1週</label>
+											</div>
 						
-											<label class="radio-button">
-												<input type="radio" name="radio-price" value="month">
-												<span class="checkmark" id="month" onclick="timeclick_soneki('monthly');" value="month">1月</span>
-                      </label>
+											<div class="radio-button">
+												<input type="radio" name="radio-price" value="month" id="month">
+												<label for="month" class="checkmark" id="month" onclick="timeclick_soneki('monthly');" value="month">1月</label>
+                      </div>
                       
-                      <label class="radio-button" style="font-size: 10px;" >
-												<input type="radio" name="radio-price" value="other_calendar">
-                        <span class="checkmark" id="other_calendar" onclick="timeclick_soneki('monthly');" value="other_calendar">カスタム
-                          <!-- <vue-ctk-date-time-picker v-model="value" id="app" range></vue-ctk-date-time-picker> -->
-                        </span>
-                      </label>
+                      <div class="radio-button" style="font-size: 10px;" >
+												<input type="radio" name="radio-price" value="other_calendar" id="other_calendar">
+                        <label for="other_calendar" class="checkmark" onclick="timeclick_soneki('monthly');" value="other_calendar">カスタム
+                        </label>
+                      </div>
                     </div>
 
                     <div class="radio-buttons">
 						
-											<label class="radio-button">
-                        <input type="radio" name="radio-price_chart" value="minute" checked>
-                        <span for="minute" id="minute" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">1m</span>
-											</label>
+											<div class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="minute" id="minute" checked>
+                        <label for="minute" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">1m</label>
+											</div>
 						
-                      <label class="radio-button">
-                        <input type="radio" name="radio-price_chart" value="minute">
-                        <span id="minute" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">5m</span>
-											</label>
+                      <div class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="minute" id="minutes">
+                        <label for="minutes" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="minute">5m</label>
+											</div>
 						
-											<label class="radio-button">
-                        <input type="radio" name="radio-price_chart" value="hours">
-                        <span id="hours" onclick="timing_onclick_chart_bitflyer(periods,this);" value="hours">1h</span>
-                      </label>
+											<div class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="hours" id="hours">
+                        <label for="hours" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="hours">1h</label>
+                      </div>
                       
-                      <label class="radio-button">
-                        <input type="radio" name="radio-price_chart" value="day">
-                        <span id="day" onclick="timing_onclick_chart_bitflyer(periods,this);" value="day">1d</span>
-                      </label>
+                      <div class="radio-button">
+                        <input type="radio" name="radio-price_chart" value="day" id="day">
+                        <label for="day" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="day">1d</label>
+                      </div>
                       
-                      <label class="radio-button" style="font-size: 10px;" onclick="displayDropdown()">
-                        <input type="radio" name="radio-price_chart" value="other_number">
-                        <span id="other_number" onclick="timing_onclick_chart_bitflyer(periods,this);" value="other_number">カスタム</span>
+                      <div class="radio-button" style="font-size: 10px;" onclick="displayDropdown()">
+                        <input type="radio" name="radio-price_chart" value="other_number" id="number">
+                        <label for="number" id="other_number" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="other_number">カスタム</label>
                         <div class="dropdown-select">
                           <p onclick="selectItem('1m')">1m</p>
                           <p  onclick="selectItem('5m')">5m</p>
@@ -365,7 +364,7 @@ var firebaseConfig = {
                           <p  onclick="selectItem('1w')">1w</p>
                           <p  onclick="selectItem('1M')">1M</p>
                         </div>
-                      </label>
+                      </div>
                           <template>
                               <div class="box">
                                 <section>
@@ -386,7 +385,6 @@ var firebaseConfig = {
                             <!-- Calendar-->
                             <script src="https://unpkg.com/vue" charset="utf-8"></script>
                             <script src="https://cdn.jsdelivr.net/npm/vue-ctk-date-time-picker@1.4.1/dist/vue-ctk-date-time-picker.umd.js" charset="utf-8"></script>
-                        
                         
                             <script type="text/javascript">
                               Vue.component('vue-ctk-date-time-picker', window['vue-ctk-date-time-picker']);
@@ -1745,14 +1743,14 @@ function strategylisting_soneki(delet){
       var style = document.createElement("style");
       document.head.appendChild(style);
       style.sheet.insertRule("#other_number {font-size: 15px}");
-      const displayNone = document.getElementsByClassName("dropdown-select");
+      const displayNone = document.getElementsByClassName(".radio-button input:checked ~ .dropdown-select");
       for (var i=0;i<displayNone.length;i+=1){
         displayNone[i].style.display = "none";
       }
     }
     function displayDropdown() {
-      var x = document.getElementsByClassName("dropdown-select");
-      for (var i=0;i<x.length;i+=1){
+      const x = document.getElementsByClassName("dropdown-select");
+      for (const i=0;i<x.length;i+=1){
         if (x[i].style.display === "none") {
           x[i].style.display = "block";
         } else {
@@ -1760,7 +1758,6 @@ function strategylisting_soneki(delet){
         }
       }
     }
-
 
 </script>
 </html>
