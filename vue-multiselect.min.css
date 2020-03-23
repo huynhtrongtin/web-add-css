@@ -71,11 +71,23 @@ body {
 
 .multiselect__tags {
   background-color: #333;
-  color: #fff;
+  color: #eee;
 }
 
-.multiselect__tags input {
-  color: #fff;
+.multiselect__input::-webkit-input-placeholder {
+  color:#fff;
+}
+
+..multiselect__input::-moz-placeholder {
+  color:#fff;
+}
+
+.multiselect__input::-ms-placeholder {
+  color:#fff;
+}
+
+.multiselect__input::placeholder {
+  color:#fff;
 }
 
 .multiselect__tags:focus {
@@ -92,4 +104,8 @@ body {
 
 .multiselect__input {
   color: #fff;
+}
+
+.multiselect__single {
+  font-size: 13px;
 }
