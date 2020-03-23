@@ -32,11 +32,7 @@
   border: 1px solid #ce6324;
 }
 
-.radio-button input[type=radio]:checked ~ .dropdow-select {
-  display: block;
-}
-
-.dropdow-select {
+.dropdown-select {
   width: 50px;
   background-color: #fff;
   position: absolute;
@@ -45,13 +41,14 @@
   font-size: 15px;
 }
 
-.dropdow-select p {
+
+.dropdown-select p {
   color: #ce6324;
   padding: 5px;
   margin: 0;
 }
 
-.dropdow-select p:hover {
+.dropdown-select p:hover {
   background-color: #eee;
 }
 

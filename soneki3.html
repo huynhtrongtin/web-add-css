@@ -352,10 +352,10 @@ var firebaseConfig = {
                         <span id="day" onclick="timing_onclick_chart_bitflyer(periods,this);" value="day">1d</span>
                       </label>
                       
-                      <label class="radio-button" style="font-size: 10px;">
+                      <label class="radio-button" style="font-size: 10px;" onclick="displayDropdown()">
                         <input type="radio" name="radio-price_chart" value="other_number">
                         <span id="other_number" onclick="timing_onclick_chart_bitflyer(periods,this);" value="other_number">カスタム</span>
-                        <div class="dropdow-select">
+                        <div class="dropdown-select">
                           <p onclick="selectItem('1m')">1m</p>
                           <p  onclick="selectItem('5m')">5m</p>
                           <p  onclick="selectItem('15m')">15m</p>
@@ -428,7 +428,7 @@ var firebaseConfig = {
 								:clear-on-select="false" 
 								:preserve-search="true" 
 								:custom-label="customLabel"
-								placeholder="Pick some" 
+								placeholder="Select" 
 								label="name" 
 								track-by="name" 
 								:preselect-first="false"
@@ -1741,13 +1741,24 @@ function strategylisting_soneki(delet){
     };
     function selectItem(item) {
       var item;
-      document.getElementById('other_number').innerHTML = item;
-      const sheet = new CSSStyleSheet();
-      sheet.replaceSync('.radio-button input[type=radio]:checked ~ .dropdow-select {display: none}');
-      document.adoptedStyleSheets = [sheet];
-      var style = document.createElement('style');
+      document.getElementById("other_number").innerHTML = item;
+      var style = document.createElement("style");
       document.head.appendChild(style);
-      style.sheet.insertRule('#other_number {font-size: 15px}');
+      style.sheet.insertRule("#other_number {font-size: 15px}");
+      const displayNone = document.getElementsByClassName("dropdown-select");
+      for (var i=0;i<displayNone.length;i+=1){
+        displayNone[i].style.display = "none";
+      }
+    }
+    function displayDropdown() {
+      var x = document.getElementsByClassName("dropdown-select");
+      for (var i=0;i<x.length;i+=1){
+        if (x[i].style.display === "none") {
+          x[i].style.display = "block";
+        } else {
+          x[i].style.display = "none";
+        }
+      }
     }
 
 
