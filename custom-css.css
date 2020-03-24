@@ -141,3 +141,7 @@ body {
   display: none;
   transform: translateY(-60px);
 }
+
+.shortcuts-container {
+  display: none;
+}
