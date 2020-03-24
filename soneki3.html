@@ -355,7 +355,7 @@ var firebaseConfig = {
                       <div class="radio-button" style="font-size: 10px;" onclick="displayDropdown()">
                         <input type="radio" name="radio-price_chart" value="other_number" id="number-select">
                         <label for="number-select" id="other_number" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="other_number"><span>カスタム</span></label>
-                        <div class="dropdown-select">
+                        <div class="dropdown-select" style="display:none;">
                           <p onclick="selectItem('1m')">1m</p>
                           <p  onclick="selectItem('5m')">5m</p>
                           <p  onclick="selectItem('15m')">15m</p>
@@ -450,7 +450,7 @@ var firebaseConfig = {
 							<!-- <pre>{{ value }}</pre> -->
               <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
               <label for="other_calendar">
-                <vue-ctk-date-time-picker auto-close="true" inline="true" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
+                <vue-ctk-date-time-picker style="display:none;" auto-close="true" inline="true" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
             </label>
 						</div>
 						
