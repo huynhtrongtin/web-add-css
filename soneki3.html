@@ -324,7 +324,8 @@ var firebaseConfig = {
                       
                       <div class="radio-button" style="font-size: 10px;" onclick="showCalendar()">
 												<input type="radio" name="radio-price" value="other_calendar" id="other_calendar">
-                        <label for="other_calendar" class="checkmark" onclick="timeclick_soneki('monthly');" value="other_calendar">カスタム
+                        <label for="other_calendar" class="checkmark" onclick="timeclick_soneki('monthly');" value="other_calendar">
+                            <span>カスタム</span>
                         </label>
                       </div>
                     </div>
@@ -353,7 +354,7 @@ var firebaseConfig = {
                       
                       <div class="radio-button" style="font-size: 10px;" onclick="displayDropdown()">
                         <input type="radio" name="radio-price_chart" value="other_number" id="number-select">
-                        <label for="number-select" id="other_number" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="other_number">カスタム</label>
+                        <label for="number-select" id="other_number" class="checkmark" onclick="timing_onclick_chart_bitflyer(periods,this);" value="other_number"><span>カスタム</span></label>
                         <div class="dropdown-select">
                           <p onclick="selectItem('1m')">1m</p>
                           <p  onclick="selectItem('5m')">5m</p>
@@ -416,7 +417,10 @@ var firebaseConfig = {
 
 					<!-- multiselect: -->
 						<div id="app">
-							<multiselect style = "width: 200px; height: 50px;"
+              <label for="other_calendar">
+                  <vue-ctk-date-time-picker no-shortcuts="true" auto-close="true" no-button-now="true" inline="true" label="" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
+              </label>
+							<multiselect style = "width: 220px; height: 50px;"
 							
 								v-model="value" 
 								:options="options" 
@@ -435,22 +439,19 @@ var firebaseConfig = {
 								:taggable="false"
 								@close = "onSelect"
 
-              >
+                                >
 							<div
 								class="selection-count"
 								slot="selection"
 								slot-scope="{ values, search, isOpen, remove }"
 							>
 							<template v-if="!isOpen && values.length">
-									{{ values.length }} options selected
+									{{ values.length - 1 }} options selected
 								</template>
               </div>	
               </multiselect>
 							<!-- <pre>{{ value }}</pre> -->
               <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
-              <label for="other_calendar">
-                <vue-ctk-date-time-picker no-shortcuts="true" auto-close="true" no-button-now="true" inline="true" label="" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
-              </label>
 						</div>
 						
 						<div id = "title">  loading... </div>
