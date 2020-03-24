@@ -40,17 +40,9 @@
   display: block;
 }
 
-/* .radio-button {
-  width: 29px;
-  height: 25px;
-  margin: 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  border: 2px solid #fff;
-  cursor: pointer;
-} */
+.radio-button input:checked + .datetimepicker.flex.has-validate-button {
+  display: block;
+}
 
 .radio-button input{
   position: absolute;
@@ -123,4 +115,14 @@ body {
 
 .multiselect__single {
   font-size: 13px;
+}
+
+#number-select, #other_calendar {
+  width: 25px;
+  height: 25px;
+}
+
+.ctk-date-time-picker {
+  display: none;
+  transform: translateY(-60px);
 }
