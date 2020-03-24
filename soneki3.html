@@ -417,9 +417,6 @@ var firebaseConfig = {
 
 					<!-- multiselect: -->
 						<div id="app">
-              <label for="other_calendar">
-                  <vue-ctk-date-time-picker no-shortcuts="true" auto-close="true" no-button-now="true" inline="true" label="" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
-              </label>
 							<multiselect style = "width: 220px; height: 50px;"
 							
 								v-model="value" 
@@ -452,6 +449,9 @@ var firebaseConfig = {
               </multiselect>
 							<!-- <pre>{{ value }}</pre> -->
               <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
+              <label for="other_calendar">
+                <vue-ctk-date-time-picker no-shortcuts="true" auto-close="true" no-button-now="true" inline="true" label="" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
+            </label>
 						</div>
 						
 						<div id = "title">  loading... </div>
