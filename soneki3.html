@@ -307,17 +307,17 @@ var firebaseConfig = {
 
 										<div class="radio-buttons">
                       
-											<div class="radio-button">
+											<div class="radio-button" onclick="displayCalendar()">
 												<input type="radio" name="radio-price" value="day" id="day" checked>
                         <label for="day" class="checkmark" onclick="timeclick_soneki('daily');" value="day">1日</label>
                       </div>
 						
-											<div class="radio-button">
+											<div class="radio-button" onclick="displayCalendar()">
 												<input type="radio" name="radio-price" value="week" id="week">
 												<label for="week" class="checkmark" onclick="timeclick_soneki('weekly');" value="week">1週</label>
 											</div>
 						
-											<div class="radio-button">
+											<div class="radio-button" onclick="displayCalendar()">
 												<input type="radio" name="radio-price" value="month" id="month">
 												<label for="month" class="checkmark" id="month" onclick="timeclick_soneki('monthly');" value="month">1月</label>
                       </div>
@@ -395,7 +395,7 @@ var firebaseConfig = {
                                   return {
                                     value: null
                                   }
-                                }
+                                },
                               });
                             </script>
                             <script>
@@ -449,9 +449,9 @@ var firebaseConfig = {
               </multiselect>
 							<!-- <pre>{{ value }}</pre> -->
               <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
-              <label for="other_calendar">
-                <vue-ctk-date-time-picker style="display:none;" auto-close="true" inline="true" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
-            </label>
+              <div class="calendar">
+                <vue-ctk-date-time-picker style="display:none;" inline="true" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
+              </div>
 						</div>
 						
 						<div id = "title">  loading... </div>
@@ -1776,16 +1776,20 @@ function strategylisting_soneki(delet){
         }
       }
     };
+    function displayCalendar() {
+      const y = document.getElementsByClassName("ctk-date-time-picker");
+      for (const i=0;i<y.length;i+=1){
+        y[i].style.display = "none";
+      }
+    }
     window.addEventListener('mouseup', function(event){
-      var box = document.getElementsByClassName('dropdown-select');
-      if (event.target  != box){
-        for (var i=0;i<box.length;i+=1){
-          box[i].style.display = "none";
+      var boxButton = document.getElementsByClassName('dropdown-select');
+      if (event.target != boxButton){
+        for (var i=0;i<boxButton.length;i+=1){
+          boxButton[i].style.display = "none";
         }
       }
     });
-
-    
 </script>
 </html>
 

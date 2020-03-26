@@ -9,6 +9,11 @@
   align-items: center;
 }
 
+.radio-button input {
+  width: 34px;
+  height: 32px;
+}
+
 .checkmark {
   width: 35px;
   height: 30px;
