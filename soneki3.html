@@ -389,14 +389,6 @@ var firebaseConfig = {
                         
                             <script type="text/javascript">
                               Vue.component('vue-ctk-date-time-picker', window['vue-ctk-date-time-picker']);
-                              new Vue({
-                                el: '#app',
-                                data () {
-                                  return {
-                                    value: null
-                                  }
-                                },
-                              });
                             </script>
                             <script>
                             export default {
@@ -443,14 +435,14 @@ var firebaseConfig = {
 								slot-scope="{ values, search, isOpen, remove }"
 							>
 							<template v-if="!isOpen && values.length">
-									{{ values.length - 1 }} options selected
+									{{ values.length }} options selected
 								</template>
               </div>	
               </multiselect>
 							<!-- <pre>{{ value }}</pre> -->
               <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
               <div class="calendar">
-                <vue-ctk-date-time-picker style="display:none;" inline="true" v-model="value" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
+                <vue-ctk-date-time-picker style="display:none;" inline="true" v-model="valueCalendar" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
               </div>
 						</div>
 						
@@ -640,6 +632,13 @@ function vue_pulldownstart_soneki(){
     // Checks all checkboxes.          
     
     new Vue({
+            el: '#app',
+            watch: {
+              valueCalendar() {
+                // TODO: Handle date change
+                console.log(this.valueCalendar);
+              }
+            },
             components: {
             Multiselect: window.VueMultiselect.default
             },
@@ -647,6 +646,7 @@ function vue_pulldownstart_soneki(){
             value: '',
             options: vue_option,
             displayDropdown: false,
+            valueCalendar: null,
             },
         methods: {
             customLabel (option) {

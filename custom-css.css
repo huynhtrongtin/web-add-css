@@ -87,15 +87,20 @@ body {
 }
 
 .multiselect__tags {
-  min-height: 19px;
+  min-height: 22px;
   background-color: #333;
   color: #eee;
-  font-size: 10px;
+  font-size: 11px;
+  height: 10px;
 }
 
 .multiselect__select {
-  height: 20px;
+  height: 21px;
   line-height: 18px;
+}
+
+.multiselect__placeholder {
+  transform: translateY(-6px);
 }
 
 .selection-count {
