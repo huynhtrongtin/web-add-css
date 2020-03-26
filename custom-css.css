@@ -135,7 +135,8 @@ body {
 }
 
 #number-select, #other_calendar {
-  width: 32px;
+  transform: translateX(-2px);
+  width: 34px;
   height: 32px;
 }
 

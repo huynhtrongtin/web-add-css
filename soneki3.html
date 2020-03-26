@@ -27,7 +27,7 @@
 	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@1.8.0"></script>
 	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@0.5.7/chartjs-plugin-annotation.min.js"></script>
      
-	<script type="application/javascript">
+  <script type="application/javascript">
 ///firebase initialization///
 var firebaseConfig = {
 			apiKey: "AIzaSyCrYGJnNmth6RvAlz6rwvUO4AG956U-P2g",
@@ -283,7 +283,7 @@ var firebaseConfig = {
 
 </head>  
     <body>
-        <div class="col s９ m9 l9" id="vueSample" >
+        <div class="col s９ m9 l9" id="vueSample">
 			<!-- style = "margin-right: -10px ; margin-left: -10px " -->
 		<div class="card" v-bind:style="{height:boardHeight+'px'}">
 
@@ -1747,11 +1747,15 @@ function strategylisting_soneki(delet){
       var style = document.createElement("style");
       document.head.appendChild(style);
       style.sheet.insertRule("#other_number {font-size: 15px}");
-      const displayNone = document.getElementsByClassName(".radio-button input:checked ~ .dropdown-select");
+      const displayNone = document.getElementsByClassName("dropdown-select");
       for (var i=0;i<displayNone.length;i+=1){
-        displayNone[i].style.display = "none";
+        if (displayNone[i].style.display === "none") {
+          displayNone[i].style.display = "block";
+        } else {
+          displayNone[i].style.display = "none";
+        }
       }
-    }
+    };
     function displayDropdown() {
       const x = document.getElementsByClassName("dropdown-select");
       for (const i=0;i<x.length;i+=1){
@@ -1761,7 +1765,7 @@ function strategylisting_soneki(delet){
           x[i].style.display = "none";
         }
       }
-    }
+    };
     function showCalendar() {
       const y = document.getElementsByClassName("ctk-date-time-picker");
       for (const i=0;i<y.length;i+=1){
@@ -1771,8 +1775,17 @@ function strategylisting_soneki(delet){
           y[i].style.display = "none";
         }
       }
-    }
+    };
+    window.addEventListener('mouseup', function(event){
+      var box = document.getElementsByClassName('dropdown-select');
+      if (event.target  != box){
+        for (var i=0;i<box.length;i+=1){
+          box[i].style.display = "none";
+        }
+      }
+    });
 
+    
 </script>
 </html>
 
