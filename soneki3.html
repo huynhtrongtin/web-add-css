@@ -432,11 +432,11 @@ var firebaseConfig = {
 							<div
 								class="selection-count"
 								slot="selection"
-								slot-scope="{ values, search, isOpen, remove }"
+                slot-scope="{ values, search, isOpen, remove }"
 							>
 							<template v-if="!isOpen && values.length">
 									{{ values.length }} options selected
-								</template>
+                </template>
               </div>	
               </multiselect>
 							<!-- <pre>{{ value }}</pre> -->
@@ -636,17 +636,21 @@ function vue_pulldownstart_soneki(){
             watch: {
               valueCalendar() {
                 // TODO: Handle date change
-                console.log(this.valueCalendar);
-              }
+                console.log('Value date start and date end: ', this.valueCalendar);
+              },
+              value() {
+                // TODO: Handle pulldown change
+                console.log('Value pulldown: ', this.value);
+              },
             },
             components: {
-            Multiselect: window.VueMultiselect.default
+              Multiselect: window.VueMultiselect.default
             },
             data: {
-            value: '',
-            options: vue_option,
-            displayDropdown: false,
-            valueCalendar: null,
+              value: '',
+              options: vue_option,
+              displayDropdown: false,
+              valueCalendar: null,
             },
         methods: {
             customLabel (option) {
