@@ -390,7 +390,7 @@ var firebaseConfig = {
                             <script type="text/javascript">
                               Vue.component('vue-ctk-date-time-picker', window['vue-ctk-date-time-picker']);
                             </script>
-                            <script>
+                            <!-- <script>
                             export default {
                               name: 'Range',
                               data() {
@@ -400,7 +400,7 @@ var firebaseConfig = {
                                 };
                               },
                             };
-                            </script>
+                            </script> -->
 						
                     </div>
                 </div>
@@ -442,7 +442,7 @@ var firebaseConfig = {
 							<!-- <pre>{{ value }}</pre> -->
               <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
               <div class="calendar">
-                <vue-ctk-date-time-picker style="display:none;" inline="true" v-model="valueCalendar" color="#ef865b" range-mode="true"></vue-ctk-date-time-picker>
+                <vue-ctk-date-time-picker style="display:none;" :inline="true" v-model="valueCalendar" color="#ef865b" :range-mode="true"></vue-ctk-date-time-picker>
               </div>
 						</div>
 						
@@ -639,8 +639,8 @@ function vue_pulldownstart_soneki(){
                 console.log('Value date start and date end: ', this.valueCalendar);
               },
               value() {
-                // TODO: Handle pulldown change
-                console.log('Value pulldown: ', this.value);
+                // TODO: Handle multiselect change
+                console.log('Value multiselect: ', this.value);
               },
             },
             components: {
@@ -1746,7 +1746,8 @@ function strategylisting_soneki(delet){
         }
     };
     function selectItem(item) {
-      var item;
+      // TODO: Handle multiselect change
+      console.log('Value pulldown: ', item);
       document.getElementById("other_number").innerHTML = item;
       var style = document.createElement("style");
       document.head.appendChild(style);
@@ -1762,7 +1763,7 @@ function strategylisting_soneki(delet){
     };
     function displayDropdown() {
       const x = document.getElementsByClassName("dropdown-select");
-      for (const i=0;i<x.length;i+=1){
+      for (let i=0;i<x.length;i+=1){
         if (x[i].style.display === "none") {
           x[i].style.display = "block";
         } else {
@@ -1772,7 +1773,7 @@ function strategylisting_soneki(delet){
     };
     function showCalendar() {
       const y = document.getElementsByClassName("ctk-date-time-picker");
-      for (const i=0;i<y.length;i+=1){
+      for (let i=0;i<y.length;i+=1){
         if (y[i].style.display === "none") {
           y[i].style.display = "block";
         } else {
@@ -1782,7 +1783,7 @@ function strategylisting_soneki(delet){
     };
     function displayCalendar() {
       const y = document.getElementsByClassName("ctk-date-time-picker");
-      for (const i=0;i<y.length;i+=1){
+      for (let i=0;i<y.length;i+=1){
         y[i].style.display = "none";
       }
     }
